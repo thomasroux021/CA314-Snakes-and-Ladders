@@ -23,5 +23,7 @@ sock = connect()
 while 1:
     message = input('message to server =')
     sock.sendall(bytes(json.dumps({'message': message}), encoding='utf-8'))
-    data = json.loads(sock.recv(1024).decode('utf-8'))
-    print('server say', data)
+    data = sock.recv(1024)
+    if (data):
+        server_data = json.loads(data.decode('utf-8'))
+        print('server say', server_data)
