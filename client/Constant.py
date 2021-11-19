@@ -8,3 +8,8 @@ class Constant:
     ladclr = (195,64,54)
     pla1clr = (0,211,255)
     pla2clr = (255,121,191)
+
+    MENU = 0
+    MATCH_MAKING = 1
+    GAME = 2
+    WINNER = 3

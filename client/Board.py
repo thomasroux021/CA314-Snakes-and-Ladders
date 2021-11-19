@@ -1,15 +1,17 @@
 from typing import List
 from Constant import *
-from Utils import *
-import pygame
 
-from Square import *
+from Square import Square
+from Snake import Snake
+from Ladder import Ladder
 
 
 class Board:
     def __init__(self, gameDisplay):
         # board List
         self.board: List[List[Square]] = []
+        self.snakes: List[Snake] = []
+        self.ladders: List[Ladder] = []
         self.gameDisplay = gameDisplay
         isLeftRight = True
         for i in range(0, 10):
@@ -32,6 +34,12 @@ class Board:
                 if self.board[i][j].pos == position:
                     return self.board[i][j]
 
+    def event_add_snakes_ladders(self, snakes, ladders):
+        for snake in snakes:
+            self.snakes.append(Snake(snake[0], snake[1], self.gameDisplay, self))
+        for ladder in ladders:
+            self.ladders.append(Ladder(ladder[0], ladder[1], self.gameDisplay, self))
+
     def draw(self):
         for i in self.board:
             for j in i:
@@ -40,5 +48,9 @@ class Board:
                 else:
                     colorb = Constant.boardclr2
                 j.draw(colorb)
+        for snake in self.snakes:
+            snake.draw()
+        for ladder in self.ladders:
+            ladder.draw()
 
                 

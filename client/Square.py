@@ -1,7 +1,7 @@
 from typing import List
 import pygame
 import Constant
-import Utils
+from Utils import Utils
 from Piece import *
 
 class Square:

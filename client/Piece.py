@@ -1,3 +1,4 @@
+from time import sleep
 import pygame
 import random
 from Board import *
@@ -5,7 +6,7 @@ from Board import *
 class Piece:
     def __init__(self, gameDisplay, colour, board, userUid):
         self.gameDisplay = gameDisplay
-        self.colour = colour
+        self.colour = tuple(colour)
         self.size = 10
         self.position = 1
         self.board: Board = board
@@ -15,7 +16,7 @@ class Piece:
         self.userUid = userUid
         square.add_piece(self)
 
-    def move(self, diceNumber):
+    def move(self, diceNumber, position):
         oldPosition = self.position
         if self.position + diceNumber <= 100:
             self.position += diceNumber
@@ -27,7 +28,11 @@ class Piece:
         oldSquare = self.board.get_square(oldPosition)
         oldSquare.remove_piece(self)
 
-        square = self.board.get_square(self.position)
+        if (self.position == position):
+            square = self.board.get_square(self.position)
+        else:
+            self.position = position
+            square = self.board.get_square(position)
         self.x = square.x
         self.y = square.y
         square.add_piece(self)

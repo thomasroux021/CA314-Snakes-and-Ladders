@@ -4,15 +4,15 @@ import random
 
 class Dice:
     def __init__(self, gameDisplay) -> None:
-        self.value = 0
+        self.value = 1
         self.playerUid = None
         self.isServResp = False
-        self.showDice = False
+        self.rollDiceAnimation = False
         self.gameDisplay = gameDisplay
         self.size = 25
 
-    def set_player_uid_turn(self, uid):
-        self.playerUid = uid
+    def roll_dice_animation(self, data):
+        self.rollDiceAnimation = True
 
     def setServResp(self, value):
         self.value = value
@@ -76,19 +76,20 @@ class Dice:
 
 
     def draw(self):
-        if (self.showDice):
-            no = random.randint(1,6) if (not self.isServResp) else self.value
-            if no == 1:
-                self.one()
-            elif no == 2:
-                self.two()
-            elif no == 3:
-                self.three()
-            elif no == 4:
-                self.four()
-            elif no == 5:
-                self.five()
-            elif no == 6:
-                self.six()
+        # if (self.showDice):
+        no = random.randint(1,6) if (not self.isServResp and self.rollDiceAnimation) else self.value
+        if no == 1:
+            self.one()
+        elif no == 2:
+            self.two()
+        elif no == 3:
+            self.three()
+        elif no == 4:
+            self.four()
+        elif no == 5:
+            self.five()
+        elif no == 6:
+            self.six()
+        if (self.rollDiceAnimation):
             pygame.time.wait(100)
             pygame.display.update()

@@ -1,4 +1,4 @@
-import os
+import os, sys
 import socket
 import selectors
 import time
@@ -26,9 +26,10 @@ class Server:
         else:
             Server.__instance = self
 
-    def init(self, listeningFct = []):
+    def init(self, removeFct = None, listeningFct = []):
         self.host: str = os.getenv("HOST")
         self.port: str = os.getenv("PORT")
+        self.removeFct = removeFct
         self.listeningFct: List[any] = listeningFct
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sel = selectors.DefaultSelector()
@@ -43,11 +44,11 @@ class Server:
             print(f"server running on {self.host}:{self.port}")
             self.sel.register(self.sock, selectors.EVENT_READ, data=None)
         except:
-            time.sleep(5)
-            self.start_server()
+            time.sleep(timeout)
+            self.start_server(timeout)
     
     def accept_connection(self, sock):
-        conn, addr = self.sock.accept()  # Should be ready to read
+        conn, addr = sock.accept()  # Should be ready to read
         print('accepted connection from', addr)
         conn.setblocking(False)
         data = types.SimpleNamespace(addr=addr, inb=b'', outb=b'')
@@ -63,6 +64,8 @@ class Server:
             if recv_data:
                 data.outb += recv_data
             else:
+                if (self.removeFct):
+                    self.removeFct(None, data.addr[1])
                 print('closing connection to', data.addr)
                 self.sel.unregister(sock)
                 sock.close()
@@ -78,12 +81,12 @@ class Server:
         sock.send(bytes(json.dumps(data), encoding='utf-8'))
     
     def sendToAll(self, data):
-        # try:
-        for socket, _ in self.sel.select(timeout=None):
-            print("socket = ", socket)
-            socket.fileobj.send(bytes(json.dumps(data), encoding='utf-8'))
-        # except:
-        #     print("error")
+        try:
+            for socket, _ in self.sel.select(timeout=None):
+                print("socket = ", socket)
+                socket.fileobj.send(bytes(json.dumps(data), encoding='utf-8'))
+        except:
+            print("error")
 
     def close(self):
         self.sock.close()
@@ -91,13 +94,15 @@ class Server:
     
     def addListeningFct(self, fct):
         self.listeningFct.append(fct)
-        print(self.listeningFct)
 
     def listenEvent(self):
-        while True:
-            events = self.sel.select(timeout=None)
-            for key, mask in events:
-                if key.data is None:
-                    self.accept_connection(key.fileobj)
-                else:
-                    self.service_connection(key, mask)
+        try:
+            while True:
+                events = self.sel.select(timeout=None)
+                for key, mask in events:
+                    if key.data is None:
+                        self.accept_connection(key.fileobj)
+                    else:
+                        self.service_connection(key, mask)
+        except KeyboardInterrupt:
+            sys.exit(0)
