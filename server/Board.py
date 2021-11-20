@@ -1,4 +1,5 @@
 import random
+from typing import Counter
 
 class Board:
     def __init__(self, nb_snake, nb_ladder):
@@ -32,8 +33,8 @@ class Board:
         for i in range(nb_snake):
             val = True
             while val:
-                rand1 = random.randint(1, self.square)
-                rand2 = random.randint(1, self.square)
+                rand1 = random.randint(2, self.square)
+                rand2 = random.randint(1, rand1 - 1)
                 diff = rand1-rand2
                 if diff > 10 or diff < -10:
                     if rand1 not in self.countarr and rand2 not in self.countarr:
@@ -45,9 +46,9 @@ class Board:
             for x in self.boardarr:
                 for y in x:
                     if rand1 == y[2]:
-                        a = y
+                        a = y[2]
                     if rand2 == y[2]:
-                        b = y
+                        b = y[2]
             snakes.append([a, b])
         return snakes
 
@@ -56,8 +57,8 @@ class Board:
         for i in range(nb_ladder):
             val = True
             while val:
-                rand1 = random.randint(1, self.square)
-                rand2 = random.randint(1, self.square)
+                rand1 = random.randint(1, self.square - 1)
+                rand2 = random.randint(rand1 + 1, self.square)
                 diff = rand1-rand2
                 if diff > 10 or diff < -10:
                     if rand1 not in self.countarr and rand2 not in self.countarr:
@@ -69,8 +70,8 @@ class Board:
             for x in self.boardarr:
                 for y in x:
                     if rand1 == y[2]:
-                        a = y
+                        a = y[2]
                     if rand2 == y[2]:
-                        b = y
-            ladders.append((a, b))
+                        b = y[2]
+            ladders.append([a, b])
         return ladders

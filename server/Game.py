@@ -70,8 +70,8 @@ class Game:
         self.board = Board(random.randint(4,8), random.randint(4,8))
         random.shuffle(self.players)
         Server.getInstance().sendToAll(Utils.all('GAME_START', {
-            'snakes': [[snake[0][2], snake[1][2]] for snake in self.board.snakes],
-            'ladders': [[ladder[0][2], ladder[1][2]] for ladder in self.board.ladders],
+            'snakes': [snake for snake in self.board.snakes],
+            'ladders': [ladder for ladder in self.board.ladders],
             'order': [player.uid for player in self.players]
         }))
         self.player_turn = self.players.pop(0)
