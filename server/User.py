@@ -6,7 +6,7 @@ class User:
         self.uid = userId
         self.username = userName
         self.color = color
-        self.position = 0
+        self.position = 1
         self.score = 0
     
     def getScore(self):
@@ -27,7 +27,7 @@ class User:
         for start, end in board.ladders:
             if (position == start):
                 position = end
-        self.position = max(board.square, position)
+        self.position = min(board.square, position)
 
     def toJSON(self):
         return json.dumps(self, default=lambda o: o.__dict__, 
