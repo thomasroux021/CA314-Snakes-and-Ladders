@@ -38,13 +38,13 @@ class Game:
             self.player_turn = self.players.pop(0)
             self.players.append(self.player_turn)
             Server.getInstance().sendToAll(Utils.all('PLAYER_TURN', {'uid': self.player_turn.uid}))
-            Server.getInstance().sendToAll(Utils.all('UPDATE_PLAYERS', 
-                {'players': [{
-                    'uid': player.uid,
-                    'username': player.username,
-                    'color': player.color
-                } for player in self.players]
-            }))
+        Server.getInstance().sendToAll(Utils.all('UPDATE_PLAYERS', 
+            {'players': [{
+                'uid': player.uid,
+                'username': player.username,
+                'color': player.color
+            } for player in self.players]
+        }))
     
     def add_player(self, data, uid):
         if (self.game_start):
