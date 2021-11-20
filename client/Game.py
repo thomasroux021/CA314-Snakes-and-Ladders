@@ -12,6 +12,7 @@ from Dice import *
 from Container.PlayerView import PlayerView
 from Snake import Snake
 from Ladder import Ladder
+from Menu import *
 
 from Utils import Utils
 from QueueView import QueueView
@@ -27,6 +28,7 @@ class Game:
         self.uid = None
         self.gameDisplay = pygame.display.set_mode((self.display_width,self.display_height))
         pygame.display.set_caption('Snakes And Ladders')
+        pygame.font.init()
 
         self.gameView = [False, False, True, False]
         self.gameRun = True
@@ -35,6 +37,7 @@ class Game:
         self.clock = pygame.time.Clock()
         self.dice = Dice(self.gameDisplay)
         self.board = Board(self.gameDisplay)
+        self.menu = Menu(self.gameDisplay, self.quit_game, self.join_queue)
 
         self.playerWinner = None
 
@@ -58,8 +61,10 @@ class Game:
                 for event in event_list:
                     if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
                         self.gameRun = False
-                #if (self.gameView.index(True) == Constant.MENU):
-                if (self.gameView.index(True) == Constant.MATCH_MAKING):
+                if (self.gameView.index(True) == Constant.MENU):
+                    self.menu.handle_event(event)
+                    self.menu.draw()
+                elif (self.gameView.index(True) == Constant.MATCH_MAKING):
                     self.queue_view.draw(event_list, self.go_out_from_queue)
                 elif (self.gameView.index(True) == Constant.GAME):
                     self.board.draw()
@@ -83,6 +88,14 @@ class Game:
         self.uid = data['uid']
         self.queue_view.set_my_uid(self.uid)
         Client.getInstance().send(Utils.all("ADD_PLAYER", {'username': 'Remi', 'uid': self.uid}))
+    
+    def quit_game(self):
+        self.gameRun = False
+
+    def join_queue(self):
+        Client.getInstance().send(Utils.all("ADD_PLAYER", {'username': self.menu.get_username(), 'uid': self.uid}))
+        self.gameView[Constant.MENU] = False
+        self.gameView[Constant.MATCH_MAKING] = True
     
     def list_player(self, data):
         for dataPlayer in data["players"]:
