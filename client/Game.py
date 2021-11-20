@@ -11,6 +11,7 @@ from Player import *
 from Dice import *
 from Snake import Snake
 from Ladder import Ladder
+from Menu import *
 
 from Utils import Utils
 
@@ -25,6 +26,7 @@ class Game():
         self.uid = None
         self.gameDisplay = pygame.display.set_mode((self.display_width,self.display_height))
         pygame.display.set_caption('Snakes And Ladders')
+        pygame.font.init()
 
         self.gameView = [True, False, False, False]
         self.gameRun = True
@@ -33,6 +35,7 @@ class Game():
         self.clock = pygame.time.Clock()
         self.dice = Dice(self.gameDisplay)
         self.board = Board(self.gameDisplay)
+        self.menu = Menu(self.gameDisplay, self.quit_game, self.join_queue)
 
         self.playerWinner = None
 
@@ -43,15 +46,20 @@ class Game():
 
 
     def draw(self):
-        self.gameDisplay.fill(Constant.back)
         try:
             while self.gameRun:
+                self.gameDisplay.fill(Constant.back)
                 Client.getInstance().receive()
                 for event in pygame.event.get():
                     if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
                         self.gameRun = False
-                self.board.draw()
-                self.dice.draw()
+                    if (self.gameView[Constant.MENU]):
+                        self.menu.handle_event(event)
+                if (self.gameView[Constant.MENU]):
+                    self.menu.draw()
+                else:
+                    self.board.draw()
+                    self.dice.draw()
                 pygame.display.update()
                 self.clock.tick(60)
             pygame.quit()
@@ -59,9 +67,17 @@ class Game():
             pygame.quit()
             sys.exit()
 
+    def quit_game(self):
+        self.gameRun = False
+
+    def join_queue(self):
+        Client.getInstance().send(Utils.all("ADD_PLAYER", {'username': self.menu.get_username(), 'uid': self.uid}))
+        self.gameView[Constant.MENU] = False
+        self.gameView[Constant.MATCH_MAKING] = True
+
     def me(self, data):
         self.uid = data['uid']
-        Client.getInstance().send(Utils.all("ADD_PLAYER", {'username': 'Remi', 'uid': self.uid}))
+        # Client.getInstance().send(Utils.all("ADD_PLAYER", {'username': 'Remi', 'uid': self.uid}))
     
     def list_player(self, data):
         for dataPlayer in data["players"]:
