@@ -30,7 +30,7 @@ class Game:
         pygame.display.set_caption('Snakes And Ladders')
         pygame.font.init()
 
-        self.gameView = [False, False, True, False]
+        self.gameView = [True, False, False, False]
         self.gameRun = True
         self.myTurn = False
 
