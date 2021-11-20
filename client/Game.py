@@ -61,8 +61,9 @@ class Game:
                 for event in event_list:
                     if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
                         self.gameRun = False
+                    if (self.gameView.index(True) == Constant.MENU):
+                        self.menu.handle_event(event)
                 if (self.gameView.index(True) == Constant.MENU):
-                    self.menu.handle_event(event)
                     self.menu.draw()
                 elif (self.gameView.index(True) == Constant.MATCH_MAKING):
                     self.queue_view.draw(event_list, self.go_out_from_queue)
