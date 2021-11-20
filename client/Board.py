@@ -39,6 +39,12 @@ class Board:
             self.snakes.append(Snake(snake[0], snake[1], self.gameDisplay, self))
         for ladder in ladders:
             self.ladders.append(Ladder(ladder[0], ladder[1], self.gameDisplay, self))
+    
+    def remove_piece(self, piece):
+        for i in self.board:
+            for j in i:
+                if (piece) in j.get_pieces():
+                    j.remove_piece(piece)
 
     def draw(self):
         for i in self.board:

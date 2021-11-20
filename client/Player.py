@@ -1,10 +1,10 @@
-import Piece 
+from Piece import Piece
 
 class Player:
-    def __init__(self, userId, userName, piece: Piece.Piece) -> None:
+    def __init__(self, userId, userName, piece: Piece) -> None:
         self.uid = userId
         self.name = userName
-        self.piece = piece
+        self.piece: Piece = piece
         self.turn = False
 
     def set_piece(self, piece):

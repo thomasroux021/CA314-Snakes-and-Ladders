@@ -17,6 +17,9 @@ class Square:
     
     def remove_piece(self, piece):
         self.pieces.remove(piece)
+    
+    def get_pieces(self) -> List[Piece]:
+        return self.pieces
 
     def draw(self, colorb):
         pygame.draw.rect(self.gameDisplay, (colorb), (self.x, self.y, 59, 59))
