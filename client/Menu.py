@@ -1,7 +1,7 @@
 import pygame
 
-from InputBox import *
-from Button import *
+from Container.InputBox import InputBox
+from Container.Button import Button
 
 class Menu:
     def __init__(self, gameDisplay, quit_fct, play_fct):

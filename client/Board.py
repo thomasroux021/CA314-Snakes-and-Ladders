@@ -35,10 +35,10 @@ class Board:
                     return self.board[i][j]
 
     def event_add_snakes_ladders(self, snakes, ladders):
-        for snake in snakes:
-            self.snakes.append(Snake(snake[0], snake[1], self.gameDisplay, self))
-        for ladder in ladders:
-            self.ladders.append(Ladder(ladder[0], ladder[1], self.gameDisplay, self))
+        for idx, snake in enumerate(snakes):
+            self.snakes.append(Snake(snake[0], snake[1], self.gameDisplay, self, idx))
+        for idx, ladder in enumerate(ladders):
+            self.ladders.append(Ladder(ladder[0], ladder[1], self.gameDisplay, self, idx))
     
     def remove_piece(self, piece):
         for i in self.board:

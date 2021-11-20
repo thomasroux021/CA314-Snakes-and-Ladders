@@ -88,15 +88,15 @@ class Game:
     def me(self, data):
         self.uid = data['uid']
         self.queue_view.set_my_uid(self.uid)
-        Client.getInstance().send(Utils.all("ADD_PLAYER", {'username': 'Remi', 'uid': self.uid}))
+        # Client.getInstance().send(Utils.all("ADD_PLAYER", {'username': 'Remi', 'uid': self.uid}))
     
     def quit_game(self):
         self.gameRun = False
 
     def join_queue(self):
-        Client.getInstance().send(Utils.all("ADD_PLAYER", {'username': self.menu.get_username(), 'uid': self.uid}))
         self.gameView[Constant.MENU] = False
         self.gameView[Constant.MATCH_MAKING] = True
+        Client.getInstance().send(Utils.all("ADD_PLAYER", {'username': self.menu.get_username(), 'uid': self.uid}))
     
     def list_player(self, data):
         for dataPlayer in data["players"]:
@@ -105,17 +105,11 @@ class Game:
                 newPiece = Piece(self.gameDisplay, dataPlayer["color"], self.board, dataPlayer["uid"])
                 self.players.append(Player(dataPlayer["uid"], dataPlayer["username"], newPiece))
                 self.queue_view.update_player(self.players)
-                
-                self.players_view.clear()
-                ## Remove
-                for idx,player in enumerate(self.players):
-                    self.players_view.append(PlayerView(self.gameDisplay, player, 630, idx * 70 + 320, self.uid))
-                ## end Remove
-                
-                ## to uncomment
-                # self.gameView[Constant.MENU] = False
-                # self.gameView[Constant.MATCH_MAKING] = True
-                ## end to uncomment
+                # ## Remove
+                # self.players_view.clear()
+                # for idx,player in enumerate(self.players):
+                #     self.players_view.append(PlayerView(self.gameDisplay, player, 630, idx * 70 + 320, self.uid))
+                # ## end Remove
             else:
                 continue
     
@@ -124,7 +118,7 @@ class Game:
         odered_list_player = []
         for uid in data["order"]:
             player = list(filter(lambda x: x.uid == uid, self.players))
-            odered_list_player.append(player)
+            odered_list_player.append(player[0])
         self.gameView[Constant.MATCH_MAKING] = False
         self.gameView[Constant.GAME] = True
         self.players = odered_list_player
@@ -140,13 +134,13 @@ class Game:
     def player_dice_move(self, data):
         player: Player = list(filter(lambda x: x.uid == data["uid"], self.players))
         self.dice.setServResp(data["value"])
-        player.piece.move(data["value"], data["position"])
+        player[0].piece.move(data["value"], data["position"])
 
     def game_end(self, data):
         self.gameView[Constant.GAME] = False
         self.gameView[Constant.WINNER] = True
         player = list(filter(lambda x: x.uid == data["uid"], self.players))
-        self.playerWinner = player
+        self.playerWinner = player[0]
 
     def update_players(self, data):
         newList = []
@@ -155,8 +149,9 @@ class Game:
             newList.append(player[0])
         for actual_player in self.players:
             if not actual_player in newList:
-                self.board.remove_piece(actual_player.get_piece())
-        self.players = newList
+                if (self.gameView[Constant.GAME]):
+                    self.board.remove_piece(actual_player.get_piece())
+                self.players.remove(actual_player)
         self.queue_view.update_player(self.players)
         self.players_view.clear()
         for idx, player in enumerate(self.players):
@@ -169,11 +164,11 @@ class Game:
         switcher = {
             "ME": self.me,
             "LIST_PLAYERS": self.list_player,
+            "UPDATE_PLAYERS": self.update_players
         }
         if (self.gameView.index(True) >= Constant.MATCH_MAKING):
             switcher.update({
                 "GAME_START": self.game_start,
-                "UPDATE_PLAYERS": self.update_players
             })
         if (self.gameView.index(True) >= Constant.GAME):
             switcher.update({    

@@ -31,7 +31,6 @@ class QueueView:
         for idx, player in enumerate(players):
             isMe = self.myUid == player.uid
             self.playersViews.append(PlayerView(self.game_display, player, 800 / 2 - 100, idx * 100 + 180, self.myUid, isMe))
-        self.game_display.fill(Constant.back)
 
     def draw(self, event_list, go_out):
         for event in event_list:
@@ -40,7 +39,6 @@ class QueueView:
                 for playerView in self.playersViews:
                     blit = playerView.get_cross_blit()
                     if (blit and blit.collidepoint(pos)):
-                        print("hello")
                         go_out()
 
         self.titleTxt.draw()

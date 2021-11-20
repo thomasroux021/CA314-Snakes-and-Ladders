@@ -85,6 +85,7 @@ class Server:
             for socket, _ in self.sel.select(timeout=None):
                 print("socket = ", socket)
                 socket.fileobj.send(bytes(json.dumps(data), encoding='utf-8'))
+                time.sleep(0.1)
         except:
             print("error")
 

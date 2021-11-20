@@ -51,8 +51,9 @@ class Client:
     
     def receive(self):
         try:
-            data = self.sock.recv(1024)
+            data = self.sock.recv(4096)
             if (data):
+                print("Data = ", data)
                 server_data = json.loads(data.decode('utf-8'))
                 print('server say', str(server_data))
                 if self.set_event_fct:
