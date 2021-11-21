@@ -65,6 +65,3 @@ class Client:
             if len(data) == 0:
                 print('orderly shutdown on server end')
                 sys.exit(0)
-
-# Client.getInstance().init()
-# Client.getInstance().receive()

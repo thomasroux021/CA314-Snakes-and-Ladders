@@ -8,6 +8,7 @@ from User import *
 from Piece import *
 from Dice import *
 from Utils import *
+from RepeatedTimer import RepeatedTimer
 
 class Game:
     def __init__(self) -> None:
@@ -17,6 +18,7 @@ class Game:
         self.game_start = False
         self.player_turn = None
         self.board = None
+        self.countDownNbr = 5
         Server.getInstance().init(self.remove_player)
         Server.getInstance().addListeningFct(self.event)
         Server.getInstance().listenEvent()
@@ -63,8 +65,12 @@ class Game:
             } for player in self.players]
         }))
         if (len(self.players) >= 2):
-            self.start_game()
+            RepeatedTimer(1, self.countDown, 5, self.start_game)
     
+    def countDown(self):
+        Server.getInstance().sendToAll(Utils.all('COUNT_DOWN', {'value': self.countDownNbr}))
+        self.countDownNbr -= 1
+
     def start_game(self):
         self.game_start = True
         self.board = Board(random.randint(4,8), random.randint(4,8))

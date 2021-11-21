@@ -35,7 +35,7 @@ class Game:
         self.gameRun = True
         self.myTurn = False
         self.turnPlayer: PlayerView = None
-        
+        self.displayCountdown = False
 
         self.clock = pygame.time.Clock()
         self.dice = Dice(self.gameDisplay)
@@ -57,6 +57,7 @@ class Game:
         self.winnerText = Text(self.gameDisplay, "WINNER", 700, 170, 50)
         self.replay_button = Button(610, 400, 180, 70, self.gameDisplay.get_rect().width, pygame.Color('red'), True, 'Replay', 30)
         self.menu_button = Button(610, 500, 180, 70, self.gameDisplay.get_rect().width, pygame.Color('red'), True, 'Back to Menu', 30)
+        self.countDownText = Text(self.gameDisplay, "Game start in ", 800 / 2, 500, 40)
         self.draw()
 
 
@@ -81,6 +82,8 @@ class Game:
                     self.menu.draw()
                 elif (self.gameView.index(True) == Constant.MATCH_MAKING):
                     self.queue_view.draw(event_list, self.go_out_from_queue)
+                    if (self.displayCountdown):
+                        self.countDownText.draw()
                 elif (self.gameView.index(True) == Constant.GAME or self.gameView.index(True) == Constant.WINNER):
                     self.board.draw()
                     if (self.gameView.index(True) == Constant.WINNER):
@@ -208,6 +211,10 @@ class Game:
 
     def defaultFct(self, data = None):
         print("event not known !")
+    
+    def countDown(self, data):
+        self.displayCountdown = True
+        self.countDownText.set_text("Game start in " + str(data['value']))
 
     def event(self, data):
         switcher = {
@@ -218,6 +225,7 @@ class Game:
         if (self.gameView.index(True) >= Constant.MATCH_MAKING):
             switcher.update({
                 "GAME_START": self.game_start,
+                "COUNT_DOWN": self.countDown,
             })
         if (self.gameView.index(True) >= Constant.GAME):
             switcher.update({    
