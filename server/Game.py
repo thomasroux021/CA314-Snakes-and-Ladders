@@ -10,6 +10,9 @@ from Dice import *
 from Utils import *
 from RepeatedTimer import RepeatedTimer
 
+import os
+
+
 class Game:
     def __init__(self) -> None:
         self.colors = self.init_color()
@@ -64,8 +67,8 @@ class Game:
                 'color': player.color
             } for player in self.players]
         }))
-        if (len(self.players) >= 2):
-            RepeatedTimer(1, self.countDown, 5, self.start_game)
+        if (len(self.players) >= 4):
+            RepeatedTimer(1, self.countDown, 6, self.start_game)
     
     def countDown(self):
         Server.getInstance().sendToAll(Utils.all('COUNT_DOWN', {'value': self.countDownNbr}))
@@ -83,6 +86,7 @@ class Game:
         self.player_turn = self.players.pop(0)
         self.players.append(self.player_turn)
         Server.getInstance().sendToAll(Utils.all('PLAYER_TURN', {'uid': self.player_turn.uid}))
+        self.countDownNbr = 5
     
     def end_game(self):
         if (self.player_turn):

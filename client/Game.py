@@ -57,7 +57,7 @@ class Game:
         self.winnerText = Text(self.gameDisplay, "WINNER", 700, 170, 50)
         self.replay_button = Button(610, 400, 180, 70, self.gameDisplay.get_rect().width, pygame.Color('red'), True, 'Replay', 30)
         self.menu_button = Button(610, 500, 180, 70, self.gameDisplay.get_rect().width, pygame.Color('red'), True, 'Back to Menu', 30)
-        self.countDownText = Text(self.gameDisplay, "Game start in ", 800 / 2, 500, 40)
+        self.countDownText = Text(self.gameDisplay, "Game start in ", 800 / 2, 560, 40)
         self.draw()
 
 
@@ -102,7 +102,6 @@ class Game:
                         self.listPlayerText.draw()
                         for player_view in self.players_view:
                             player_view.draw()
-                #elif (self.gameView.index(True) == Constant.WINNER):
                 pygame.display.update()
                 self.clock.tick(60)
             pygame.quit()
@@ -119,11 +118,14 @@ class Game:
         self.board = Board(self.gameDisplay)
 
     def replay_game(self):
+        self.displayCountdown = False
+        self.countDownText.set_text("Game start in ")
         self.gameView[Constant.WINNER] = False
         self.gameView[Constant.MATCH_MAKING] = True
-        self.players = []
-        self.snakes = []
-        self.ladders = []
+        self.players.clear()
+        self.players_view.clear()
+        self.snakes.clear()
+        self.ladders.clear()
         self.board = Board(self.gameDisplay)
         Client.getInstance().send(Utils.all("ADD_PLAYER", {'username': self.menu.get_username(), 'uid': self.uid}))
     
@@ -171,7 +173,7 @@ class Game:
         self.gameView[Constant.GAME] = True
         self.players = odered_list_player
         for idx, player in enumerate(self.players):
-            self.players_view.append(PlayerView(self.gameDisplay, player, 630, idx * 70 + 370, self.uid))
+            self.players_view.append(PlayerView(self.gameDisplay, player, 630, idx * 65 + 370, self.uid))
     
     def player_turn(self, data):
         if data['uid'] == self.uid:
@@ -207,7 +209,7 @@ class Game:
         self.queue_view.update_player(self.players)
         self.players_view.clear()
         for idx, player in enumerate(self.players):
-            self.players_view.append(PlayerView(self.gameDisplay, player, 630, idx * 70 + 370, self.uid))
+            self.players_view.append(PlayerView(self.gameDisplay, player, 630, idx * 65 + 370, self.uid))
 
     def defaultFct(self, data = None):
         print("event not known !")
