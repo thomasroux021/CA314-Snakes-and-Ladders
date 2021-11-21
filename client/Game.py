@@ -13,6 +13,7 @@ from Container.PlayerView import PlayerView
 from Snake import Snake
 from Ladder import Ladder
 from Menu import *
+from Container.Text import Text
 
 from Utils import Utils
 from QueueView import QueueView
@@ -33,6 +34,8 @@ class Game:
         self.gameView = [True, False, False, False]
         self.gameRun = True
         self.myTurn = False
+        self.turnPlayer: PlayerView = None
+        
 
         self.clock = pygame.time.Clock()
         self.dice = Dice(self.gameDisplay)
@@ -48,6 +51,8 @@ class Game:
         #View
         self.queue_view = QueueView(self.players, self.gameDisplay, self.uid)
         self.players_view: List[PlayerView] = []
+        self.turnText = Text(self.gameDisplay, "Turn", 710, 25, 50)
+        self.listPlayerText = Text(self.gameDisplay, "List Player", 700, 320, 40)
 
         self.draw()
 
@@ -63,13 +68,20 @@ class Game:
                         self.gameRun = False
                     if (self.gameView.index(True) == Constant.MENU):
                         self.menu.handle_event(event)
+                    if (self.gameView.index(True) == Constant.GAME):
+                        self.dice.event(event, self.rollDice)
+
                 if (self.gameView.index(True) == Constant.MENU):
                     self.menu.draw()
                 elif (self.gameView.index(True) == Constant.MATCH_MAKING):
                     self.queue_view.draw(event_list, self.go_out_from_queue)
                 elif (self.gameView.index(True) == Constant.GAME):
                     self.board.draw()
+                    if (self.turnPlayer):
+                        self.turnText.draw()
+                        self.turnPlayer.draw()
                     self.dice.draw()
+                    self.listPlayerText.draw()
                     for player_view in self.players_view:
                         player_view.draw()
                 #elif (self.gameView.index(True) == Constant.WINNER):
@@ -79,6 +91,13 @@ class Game:
         except KeyboardInterrupt:
             pygame.quit()
             sys.exit()
+    
+    def rollDice(self):
+        if (self.myTurn):
+            Client.getInstance().send(Utils.all("ROLL_DICE", {}))
+            self.myTurn = False
+        else:
+            print("Not your turn !")
 
     def go_out_from_queue(self):
         self.gameView[Constant.MATCH_MAKING] = False
@@ -88,7 +107,6 @@ class Game:
     def me(self, data):
         self.uid = data['uid']
         self.queue_view.set_my_uid(self.uid)
-        # Client.getInstance().send(Utils.all("ADD_PLAYER", {'username': 'Remi', 'uid': self.uid}))
     
     def quit_game(self):
         self.gameRun = False
@@ -105,11 +123,6 @@ class Game:
                 newPiece = Piece(self.gameDisplay, dataPlayer["color"], self.board, dataPlayer["uid"])
                 self.players.append(Player(dataPlayer["uid"], dataPlayer["username"], newPiece))
                 self.queue_view.update_player(self.players)
-                # ## Remove
-                # self.players_view.clear()
-                # for idx,player in enumerate(self.players):
-                #     self.players_view.append(PlayerView(self.gameDisplay, player, 630, idx * 70 + 320, self.uid))
-                # ## end Remove
             else:
                 continue
     
@@ -123,21 +136,23 @@ class Game:
         self.gameView[Constant.GAME] = True
         self.players = odered_list_player
         for idx, player in enumerate(self.players):
-            self.players_view.append(PlayerView(self.gameDisplay, player, 630, idx * 70 + 320, self.uid))
+            self.players_view.append(PlayerView(self.gameDisplay, player, 630, idx * 70 + 370, self.uid))
     
     def player_turn(self, data):
         if data['uid'] == self.uid:
             self.myTurn = True
         else:
             self.myTurn = False
+        player = list(filter(lambda x: x.uid == data['uid'], self.players))[0]
+        self.turnPlayer = PlayerView(self.gameDisplay, player, 630, 65, self.uid)
     
     def player_dice_move(self, data):
         player: Player = list(filter(lambda x: x.uid == data["uid"], self.players))
         self.dice.setServResp(data["value"])
         player[0].piece.move(data["value"], data["position"])
+        self.dice.reset()
 
     def game_end(self, data):
-        self.gameView[Constant.GAME] = False
         self.gameView[Constant.WINNER] = True
         player = list(filter(lambda x: x.uid == data["uid"], self.players))
         self.playerWinner = player[0]
@@ -155,7 +170,7 @@ class Game:
         self.queue_view.update_player(self.players)
         self.players_view.clear()
         for idx, player in enumerate(self.players):
-            self.players_view.append(PlayerView(self.gameDisplay, player, 630, idx * 70 + 320, self.uid))
+            self.players_view.append(PlayerView(self.gameDisplay, player, 630, idx * 70 + 370, self.uid))
 
     def defaultFct(self, data = None):
         print("event not known !")

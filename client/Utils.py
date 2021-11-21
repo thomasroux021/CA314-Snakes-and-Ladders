@@ -1,10 +1,10 @@
 class Utils:
     @staticmethod
-    def all(event, data = None, type = 'FOR_ALL'):
+    def all(event, data = None):
         if data is None:
-            return {'event': event, 'type': type}
+            return {'event': event}
         else:
-            return {'event': event, 'data': data, 'type': type}
+            return {'event': event, 'data': data}
 
     @staticmethod
     def text_objects(text, font , clr , *kward):

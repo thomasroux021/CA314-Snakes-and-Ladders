@@ -3,7 +3,7 @@ from Utils import *
 from Constant import *
 
 class Text:
-    def __init__(self, gameDisplay, text, x, y, size=20, color = Constant.darkback, back_color = Constant.back, font="comicsansms") -> None:
+    def __init__(self, gameDisplay: pygame.Surface, text, x, y, size=20, color = Constant.darkback, back_color = Constant.back, font="comicsansms") -> None:
         self.x = x
         self.y = y
         self.game_display = gameDisplay
