@@ -43,6 +43,7 @@ class Game:
         self.menu = Menu(self.gameDisplay, self.quit_game, self.join_queue)
 
         self.playerWinner = None
+        self.menu_clock = None
 
         self.players: List[Player] = []
         self.snakes: List[Snake] = []
@@ -53,7 +54,9 @@ class Game:
         self.players_view: List[PlayerView] = []
         self.turnText = Text(self.gameDisplay, "Turn", 710, 25, 50)
         self.listPlayerText = Text(self.gameDisplay, "List Player", 700, 320, 40)
-
+        self.winnerText = Text(self.gameDisplay, "WINNER", 700, 170, 50)
+        self.replay_button = Button(610, 400, 180, 70, self.gameDisplay.get_rect().width, pygame.Color('red'), True, 'Replay', 30)
+        self.menu_button = Button(610, 500, 180, 70, self.gameDisplay.get_rect().width, pygame.Color('red'), True, 'Back to Menu', 30)
         self.draw()
 
 
@@ -70,20 +73,32 @@ class Game:
                         self.menu.handle_event(event)
                     if (self.gameView.index(True) == Constant.GAME):
                         self.dice.event(event, self.rollDice)
+                    if (self.gameView.index(True) == Constant.WINNER):
+                        self.replay_button.handle_event(event, self.replay_game)
+                        self.menu_button.handle_event(event, self.back_menu)
 
                 if (self.gameView.index(True) == Constant.MENU):
                     self.menu.draw()
                 elif (self.gameView.index(True) == Constant.MATCH_MAKING):
                     self.queue_view.draw(event_list, self.go_out_from_queue)
-                elif (self.gameView.index(True) == Constant.GAME):
+                elif (self.gameView.index(True) == Constant.GAME or self.gameView.index(True) == Constant.WINNER):
                     self.board.draw()
-                    if (self.turnPlayer):
-                        self.turnText.draw()
-                        self.turnPlayer.draw()
-                    self.dice.draw()
-                    self.listPlayerText.draw()
-                    for player_view in self.players_view:
-                        player_view.draw()
+                    if (self.gameView.index(True) == Constant.WINNER):
+                        if (int(time.time() - self.menu_clock) > 15):
+                            self.back_menu()
+                        if (self.playerWinner):
+                            self.winnerText.draw()
+                            self.playerWinner.draw()
+                        self.replay_button.draw(self.gameDisplay)
+                        self.menu_button.draw(self.gameDisplay)
+                    elif (self.gameView.index(True) == Constant.GAME):
+                        if (self.turnPlayer):
+                            self.turnText.draw()
+                            self.turnPlayer.draw()
+                        self.dice.draw()
+                        self.listPlayerText.draw()
+                        for player_view in self.players_view:
+                            player_view.draw()
                 #elif (self.gameView.index(True) == Constant.WINNER):
                 pygame.display.update()
                 self.clock.tick(60)
@@ -91,6 +106,23 @@ class Game:
         except KeyboardInterrupt:
             pygame.quit()
             sys.exit()
+
+    def back_menu(self):
+        self.gameView[Constant.WINNER] = False
+        self.gameView[Constant.MENU] = True
+        self.players = []
+        self.snakes = []
+        self.ladders = []
+        self.board = Board(self.gameDisplay)
+
+    def replay_game(self):
+        self.gameView[Constant.WINNER] = False
+        self.gameView[Constant.MATCH_MAKING] = True
+        self.players = []
+        self.snakes = []
+        self.ladders = []
+        self.board = Board(self.gameDisplay)
+        Client.getInstance().send(Utils.all("ADD_PLAYER", {'username': self.menu.get_username(), 'uid': self.uid}))
     
     def rollDice(self):
         if (self.myTurn):
@@ -153,9 +185,11 @@ class Game:
         self.dice.reset()
 
     def game_end(self, data):
+        self.menu_clock = time.time()
+        self.gameView[Constant.GAME] = False
         self.gameView[Constant.WINNER] = True
         player = list(filter(lambda x: x.uid == data["uid"], self.players))
-        self.playerWinner = player[0]
+        self.playerWinner = PlayerView(self.gameDisplay, player[0], 630, 240, self.uid)
 
     def update_players(self, data):
         newList = []
@@ -195,8 +229,8 @@ class Game:
         switcher.update({"DEFAULT": self.defaultFct})
         print(data['event'])
         print(data['data'])
-        # try:
-        switcher.get(data['event'], "DEFAULT")(data["data"])
-        # except:
-        #     self.defaultFct()
+        try:
+            switcher.get(data['event'], "DEFAULT")(data["data"])
+        except:
+            self.defaultFct()
 Game()

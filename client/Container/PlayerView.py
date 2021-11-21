@@ -1,3 +1,5 @@
+import math
+
 from Player import *
 from Container.Text import *
 
@@ -15,7 +17,7 @@ class PlayerView:
         username = self.player.name
         if (self.player.uid == myUid):
             username += " (me)"
-        self.usernameText = Text(self.game_display, username, self.x + 100, self.y, 30)
+        self.usernameText = Text(self.game_display, username, self.x + 100, self.y, 31 - math.ceil(1.6 * max(0, len(username) - 11)))
         self.crossText: Text = None
         if (self.display_cross):
             self.crossText = Text(self.game_display, "X", self.x + 180, self.y, 40, (255, 0, 0))

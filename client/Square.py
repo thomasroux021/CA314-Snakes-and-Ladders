@@ -21,15 +21,17 @@ class Square:
     def get_pieces(self) -> List[Piece]:
         return self.pieces
 
-    def draw(self, colorb):
-        pygame.draw.rect(self.gameDisplay, (colorb), (self.x, self.y, 59, 59))
-        smallText = pygame.font.SysFont("comicsansms", 20)
-        textSurf, textRect = Utils.text_objects(str(self.pos), smallText, Constant.darkback)
-        textRect.center = ((self.x+(60/2)), (self.y+(60/2)))
-        self.gameDisplay.blit(textSurf, textRect)
+    def draw_piece(self):
         for idx, piece in enumerate(self.pieces):
             x = 0
             if (len(self.pieces) >= 2):
                 x = -(60 / len(self.pieces))
                 x += (idx) * (60 / len(self.pieces))
             piece.draw(x)
+
+    def draw(self, colorb):
+        pygame.draw.rect(self.gameDisplay, (colorb), (self.x, self.y, 59, 59))
+        smallText = pygame.font.SysFont("comicsansms", 20)
+        textSurf, textRect = Utils.text_objects(str(self.pos), smallText, Constant.darkback)
+        textRect.center = ((self.x+(60/2)), (self.y+(60/2)))
+        self.gameDisplay.blit(textSurf, textRect)

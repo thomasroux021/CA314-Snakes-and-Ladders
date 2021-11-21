@@ -62,7 +62,7 @@ class Game:
                 'color': player.color
             } for player in self.players]
         }))
-        if (len(self.players) >= 1):
+        if (len(self.players) >= 2):
             self.start_game()
     
     def start_game(self):

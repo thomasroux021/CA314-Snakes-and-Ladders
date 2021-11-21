@@ -58,5 +58,12 @@ class Board:
             snake.draw()
         for ladder in self.ladders:
             ladder.draw()
+        for i in self.board:
+            for j in i:
+                if int(j.pos) % 2 == 0:
+                    colorb = Constant.boardclr
+                else:
+                    colorb = Constant.boardclr2
+                j.draw_piece()
 
                 
