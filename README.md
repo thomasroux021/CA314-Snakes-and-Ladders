@@ -1,5 +1,42 @@
 # CA314-Snake-and-Ladders
 
+## Requirements
+The version of python need to be equal or upper than 3.9
+The project development was make with the python version (3.9.9)
+
+Install this requires packages : 
+
+pip install pygame
+pip install load_dotenv
+
+After that, create .env file :
+Take the data inside the .env.example for creating your .env
+Else, you have just to rename the .env.example file into .env
+
+## Run the program
+
+-> Linux
+
+You can use the files server_game.sh and snakes_and_ladders.sh which are bash scripts that launch respectively the server and 4 clients (required).
+
+-> Windows
+
+You can use the files server_game.bat and lunch_4_clients.bat which are batch scripts that launch the server and the 4 clients respectively (required).
+
+-> Through a terminal on any OS
+
+Lunch the server :
+```
+cd server
+python Game.py
+```
+
+Lunch a client:  
+```
+cd client
+python Game.py
+```
+
 ## Events (Receive):
 
 ### Server:
